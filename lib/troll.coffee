@@ -6,7 +6,7 @@ class Troll
 
   # ----- Public
   getParsedOpts: ->
-    return @parsedOpts
+    @parsedOpts
 
   parse: ->
     @handle arg for arg in process.argv
