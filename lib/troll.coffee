@@ -3,10 +3,14 @@ _ = require 'underscore'
 class Troll
   constructor: ->
     @parsedOpts = {}
+    @shortOpts  = {}
 
   # ----- Public
   getParsedOpts: ->
     @parsedOpts
+
+  getShortOpts: ->
+    @shortOpts
 
   parse: ->
     @handle arg for arg in process.argv
@@ -15,17 +19,20 @@ class Troll
     console.log arg
 
   opt: (name, description, opts) ->
+    @parsedOpts[name] = new Option(name, description, opts)
     _.extend opts, 'desc': description
     @parsedOpts[name] = opts
     if _.has(opts, 'short')
-      @parsedOpts[opts['short']] = opts
+      @shortOpts[opts['short']] = name
     else
-      @parsedOpts[@findShortFor(name)] = opts
+      short = @findShortFor(name)
+      @shortOpts[short] = name
+      @parsedOpts[name]['short'] = short
+
 
   options: (callback) ->
     callback this
     @generate_parser
-    console.log @parsedOpts
 
   # ----- Private
   generateParser: ->
@@ -39,8 +46,8 @@ class Troll
 
   nextAvailableCharacter: (list) ->
     for letter in list
-      return letter unless _.has(@parsedOpts, letter)
-      return letter.toUpperCase() unless _.has(@parsedOpts, letter.toUpperCase())
+      return letter unless _.has(@shortOpts, letter)
+      return letter.toUpperCase() unless _.has(@shortOpts, letter.toUpperCase())
 
 #(new Troll).parse()
 #
