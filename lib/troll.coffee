@@ -1,5 +1,13 @@
 _ = require 'underscore'
 
+class Option
+
+  constructor: (@name, @description, @opts) ->
+    _.extend opts, 'desc': description
+
+  setShort: (short) ->
+    @short = short
+
 class Troll
   constructor: ->
     @parsedOpts = {}
@@ -19,10 +27,17 @@ class Troll
     console.log arg
 
   opt: (name, description, opts) ->
+    #option = new Option(name, description, opts)
     @parsedOpts[name] = new Option(name, description, opts)
     _.extend opts, 'desc': description
     @parsedOpts[name] = opts
+
     if _.has(opts, 'short')
+      previousKey = @shortOpts[opts['short']]
+
+      if previousKey
+        @parsedOpts[previousKey]['short'] = @findShortFor(previousKey)
+
       @shortOpts[opts['short']] = name
     else
       short = @findShortFor(name)

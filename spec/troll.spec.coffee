@@ -54,18 +54,23 @@ describe 'Troll', ->
 
         expect(_.has @troll.getShortOpts(), 'a').toBe true
 
-      it 'resolves shorthand options assigned by hand that collide', ->
-        @troll.opt 'collision', 'A colliding opt', short: 'F'
-
-        expect(@troll.getShortOpts()['F']).toEqual 'collision'
-
   describe 'defining multiple options', ->
+    beforeEach ->
+      @troll = new Troll()
     
     it 'handles more than one option', ->
-      troll = new Troll()
-      troll.options (t) ->
+      @troll.options (t) ->
         t.opt 'one', 'Option one', default: true
         t.opt 'two', 'Option two', default: true
 
-      expect(troll.getParsedOpts().one.short).toEqual 'o'
-      expect(troll.getParsedOpts().two.short).toEqual 't'
+      expect(@troll.getParsedOpts().one.short).toEqual 'o'
+      expect(@troll.getParsedOpts().two.short).toEqual 't'
+
+    it 'resolves shorthand options assigned by hand that collide', ->
+      @troll.options (t) ->
+        t.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+        t.opt 'collision', 'A colliding opt', short: 'h'
+
+      expect(@troll.getShortOpts()['h']).toEqual 'collision'
+      expect(@troll.getParsedOpts()['header']['short']).toEqual 'H'
+
