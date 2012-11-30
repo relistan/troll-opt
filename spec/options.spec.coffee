@@ -1,0 +1,54 @@
+Troll   = require('../lib/troll').Troll
+Options = require('../lib/troll').Options
+_ = require('underscore')
+
+describe 'Options', ->
+
+  describe 'without a shorthand defined', ->
+    beforeEach ->
+      @opts = new Options()
+      @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+  
+    it 'finds the correct shorthand option flag', ->
+      expect(_.has @opts.getShortOpts(), 'h').toBe true
+  
+    it 'adds the correct longhand option flag', ->
+      expect(_.has @opts.getParsedOpts(), 'header').toBe true
+  
+    it 'correctly builds the options', ->
+      expect(@opts.getParsedOpts().header.default).toEqual 'X-Shakespeare'
+      expect(@opts.getParsedOpts().header.short).toEqual 'h'
+
+  describe 'with a shorthand defined', ->
+    beforeEach ->
+      @opts = new Options()
+      @opts.opt 'header', 'Add a new header', short: 'F', default: 'X-Shakespeare'
+
+    it 'assigns the correct shorthand option flag', ->
+      expect(_.has(@opts.getShortOpts(), 'F')).toBe true
+
+  describe 'with collisions in shorthand opts', ->
+    beforeEach ->
+      @opts = new Options()
+
+    it 'capitalizes the character if the lower case is not available', ->
+      @opts.getShortOpts()['h'] = 'foo'
+      @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+
+      expect(_.has @opts.getShortOpts(), 'H').toBe true
+
+    it 'finds the next available character when the first is not available', ->
+      @opts.getShortOpts()['h'] = 'foo'
+      @opts.getShortOpts()['H'] = 'foo'
+      @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+
+      expect(_.has @opts.getShortOpts(), 'e').toBe true
+
+    it 'tries multiple options when earlier options are not available', ->
+      @opts.getShortOpts()['h'] = 'foo'
+      @opts.getShortOpts()['H'] = 'foo'
+      @opts.getShortOpts()['e'] = 'foo'
+      @opts.getShortOpts()['E'] = 'foo'
+      @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+
+      expect(_.has @opts.getShortOpts(), 'a').toBe true

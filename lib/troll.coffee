@@ -1,14 +1,6 @@
 _ = require 'underscore'
 
-class Option
-
-  constructor: (@name, @description, @opts) ->
-    _.extend opts, 'desc': description
-
-  setShort: (short) ->
-    @short = short
-
-class Troll
+class Options
   constructor: ->
     @parsedOpts = {}
     @shortOpts  = {}
@@ -20,15 +12,7 @@ class Troll
   getShortOpts: ->
     @shortOpts
 
-  parse: ->
-    @handle arg for arg in process.argv
-
-  handle: (arg) ->
-    console.log arg
-
   opt: (name, description, opts) ->
-    #option = new Option(name, description, opts)
-    @parsedOpts[name] = new Option(name, description, opts)
     _.extend opts, 'desc': description
     @parsedOpts[name] = opts
 
@@ -44,15 +28,7 @@ class Troll
       @shortOpts[short] = name
       @parsedOpts[name]['short'] = short
 
-
-  options: (callback) ->
-    callback this
-    @generate_parser
-
   # ----- Private
-  generateParser: ->
-    console.log 
-
   findShortFor: (name) ->
     char = @nextAvailableCharacter(name)
     return char if char
@@ -64,6 +40,27 @@ class Troll
       return letter unless _.has(@shortOpts, letter)
       return letter.toUpperCase() unless _.has(@shortOpts, letter.toUpperCase())
 
+class Troll
+  constructor: ->
+    @opts = new Options()
+
+  # ----- Public
+  parse: ->
+    @handle arg for arg in process.argv
+
+  handle: (arg) ->
+    console.log arg
+
+  options: (callback) ->
+    callback @opts
+    @generate_parser
+
+  getOpts: -> @opts
+
+  # ----- Private
+  generateParser: ->
+    console.log 
+
 #(new Troll).parse()
 #
 #(new Troll).options (t) -> 
@@ -71,3 +68,4 @@ class Troll
 #  t.opt 'header', 'Some description of a non-flag', 'default': 'asdf'
 
 exports.Troll = Troll
+exports.Options = Options
