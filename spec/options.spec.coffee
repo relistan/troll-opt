@@ -32,23 +32,54 @@ describe 'Options', ->
       @opts = new Options()
 
     it 'capitalizes the character if the lower case is not available', ->
-      @opts.getShortOpts()['h'] = 'foo'
+      @opts.getShortOpts().h = 'foo'
       @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
 
       expect(_.has @opts.getShortOpts(), 'H').toBe true
 
     it 'finds the next available character when the first is not available', ->
-      @opts.getShortOpts()['h'] = 'foo'
-      @opts.getShortOpts()['H'] = 'foo'
+      @opts.getShortOpts().h = 'foo'
+      @opts.getShortOpts().H = 'foo'
       @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
 
       expect(_.has @opts.getShortOpts(), 'e').toBe true
 
     it 'tries multiple options when earlier options are not available', ->
-      @opts.getShortOpts()['h'] = 'foo'
-      @opts.getShortOpts()['H'] = 'foo'
-      @opts.getShortOpts()['e'] = 'foo'
-      @opts.getShortOpts()['E'] = 'foo'
+      @opts.getShortOpts().h = 'foo'
+      @opts.getShortOpts().H = 'foo'
+      @opts.getShortOpts().e = 'foo'
+      @opts.getShortOpts().E = 'foo'
       @opts.opt 'header', 'Add a new header', default: 'X-Shakespeare'
 
       expect(_.has @opts.getShortOpts(), 'a').toBe true
+
+  describe 'validates the passed arguments', ->
+    beforeEach ->
+      @opts = new Options()
+
+    it 'requires an argument if type is defined', ->
+      @opts.opt 'header', 'Add a header', type: 'str'
+      expect(@opts.getParsedOpts().header.takesValue).toBe true
+
+    it 'does not require an argument if type is undefined and default is a boolean', ->
+      @opts.opt 'silent', 'Enable silent mode', default: false
+      expect(@opts.getParsedOpts().silent.takesValue).toBe false
+
+    it 'requires an argument if type is undefined and default is not a boolean', ->
+      @opts.opt 'header', 'Add a header', default: 'X-Something'
+      expect(@opts.getParsedOpts().header.takesValue).toBe true
+
+    it 'sets the right type based on the provided default', ->
+      @opts.opt 'header', 'Add a header', default: 'X-Something'
+      expect(@opts.getParsedOpts().header.type).toEqual 'String'
+
+      @opts.opt 'silent', 'Enable silent mode', default: false
+      expect(@opts.getParsedOpts().silent.type).toEqual 'Boolean'
+
+    it 'raises when the type was set and a default was provided', ->
+      expect( -> 
+          opts = new Options()
+          opts.opt 'header', 'Add a header', 
+            default: 'X-Something', 
+            type: 'String'
+      ).toThrow('type defined when default was provided')

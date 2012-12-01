@@ -14,7 +14,11 @@ class Options
 
   opt: (name, description, opts) ->
     _.extend opts, 'desc': description
-    @parsedOpts[name] = opts
+
+    # Figure out whether the default type needs a value passed
+    opts = @processDefaultFor(opts)
+    # Figure out if this is a flag or an option with an arg
+    @parsedOpts[name] = @processFlagOrOptFor(opts)
 
     if _.has(opts, 'short')
       previousKey = @shortOpts[opts['short']]
@@ -29,11 +33,30 @@ class Options
       @parsedOpts[name]['short'] = short
 
   # ----- Private
+  processDefaultFor: (opts) ->
+    if _.has(opts, 'default')
+      throw new Error('type defined when default was provided') if opts['type']
+      if _.contains([true, false], opts.default)
+        opts['type'] = 'Boolean'
+      else
+        opts['type'] = opts['default'].constructor.name
+
+    opts
+
+  processFlagOrOptFor: (opts) ->
+    if _.has(opts, 'type') and opts.type != 'Boolean'
+      opts['takesValue'] = true
+    else
+      opts['takesValue'] = false
+
+    opts
+
+
   findShortFor: (name) ->
     char = @nextAvailableCharacter(name)
     return char if char
 
-    return @nextAvailableCharacter('abcdefghijklmnopqrstuvwxyz')
+    @nextAvailableCharacter('abcdefghijklmnopqrstuvwxyz')
 
   nextAvailableCharacter: (list) ->
     for letter in list
