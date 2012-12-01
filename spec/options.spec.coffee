@@ -83,3 +83,12 @@ describe 'Options', ->
             default: 'X-Something', 
             type: 'String'
       ).toThrow('type defined when default was provided')
+
+  describe 'working with help banners', ->
+  
+    it 'can store a text argument', ->
+      opts = new Options()
+      banner = 'This is the banner'
+      opts.banner banner
+
+      expect(opts.getBanner()).toEqual "  #{banner}"
