@@ -104,7 +104,7 @@ class Troll
 
   getOpts: -> @opts
 
-  help: ->
+  displayOpts: ->
     # TODO: find out how to get the actual script name that was invoked
     console.log "\nUsage: #{process.argv[0]} [options]"
     console.log @opts.getBanner()
@@ -118,7 +118,7 @@ class Troll
     name = opt[0]
     opts = opt[1]
 
-    output =  @spacePad("#{name}", len + 2)
+    output =  @spacePad("#{name}", len + 1)
     output += ", -#{opts.short}"
     output += " <#{@opts.displayTypeFor(opts.type)}>" if opts.type != 'Boolean'
     output += ": #{opts.desc}"

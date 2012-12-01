@@ -1,5 +1,7 @@
-Troll   = require('../lib/troll').Troll
-Options = require('../lib/troll').Options
+Troll     = require('../lib/troll').Troll
+Options   = require('../lib/troll').Options
+CaptureIO = require('./helpers/captureio').CaptureIO
+util      = require('util')
 _ = require('underscore')
 
 describe 'Troll', ->
@@ -31,7 +33,28 @@ describe 'Troll', ->
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: true
         t.opt 'three','Option three', type: 'String'
-        t.banner 'This is so cool'
+        t.banner 'We few, we happy few, we band of brothers'
 
-    it 'pretty prints the help doc', ->
-      @troll.help()
+      # Capture stdout so we can inspect it
+      @buffer = ""
+      capture = new CaptureIO()
+      unhook = capture.hookStdout((string, encoding, fd) =>
+        @buffer += string
+      )
+
+      @troll.displayOpts()
+
+      # Unhook from stdout so we get real output
+      unhook()
+
+    it 'prints the banner', ->
+      expect(@buffer).toMatch /We few, we happy few/
+
+    it 'formats the complex options', ->
+      expect(@buffer).toMatch /--three, -T <s>: Option three/
+
+    it 'formats the flags', ->
+      expect(@buffer).toMatch /--two, -t: Option two \(default: true\)/
+
+    it 'gets the right spacing at the beginning of the line', ->
+      expect(@buffer).toMatch /[ ]{8}--one/
