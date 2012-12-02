@@ -13,7 +13,7 @@ definition.
 ```coffeescript
 Troll = require('troll').Troll
 
-(new Troll).options (troll) ->
+opts = (new Troll).options (troll) ->
   troll.banner "A great program that everyone should run every day"
   troll.opt 'awesome', 'Turn on the awesome', default: true
   troll.opt 'name',    'The name of the application', type: 'String', required: true
@@ -30,4 +30,16 @@ Usage: app.coffee [options]
    --awesome, -a: Turn on the awesome (default: true)
   --name, -n <s>: The name of the application (required)
           --help: Display this text
+```
+
+Let's pass that a command line like:
+
+```bash
+$ coffee test.coffee --name="something" --add
+```
+
+If we then inspect the contents of `opts` as defined above
+
+```coffeescript
+{ name: 'something', add: true, awesome: true }
 ```
