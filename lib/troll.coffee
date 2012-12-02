@@ -222,6 +222,7 @@ class Troll
     output += " <#{@opts.displayTypeFor(opts.type)}>" if opts.type != 'Boolean'
     output += ": #{opts.desc}"
     output += " (default: #{opts.default})" if _.has(opts, 'default')
+    output += " (required)" if _.has(opts, 'required') and opts.required
     @puts output
 
   spacePad: (str, len) ->

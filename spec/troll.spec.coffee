@@ -33,7 +33,7 @@ describe 'Troll', ->
         t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: true
-        t.opt 'three','Option three', type: 'String'
+        t.opt 'three','Option three', type: 'String', required: true
 
       spyOn(@troll, 'puts').andCallFake((args...) => @buffer += x for x in args)
 
@@ -50,6 +50,12 @@ describe 'Troll', ->
 
     it 'gets the right spacing at the beginning of the line', ->
       expect(@buffer).toMatch /[ ]{8}--one/
+
+    it 'shows the default setting for an option', ->
+      expect(@buffer).toMatch /Option two \(default: true\)/
+
+    it 'shows which options are required', ->
+      expect(@buffer).toMatch /Option three \(required\)/
 
   describe 'parsing the command line', ->
     beforeEach ->
