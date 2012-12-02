@@ -75,3 +75,13 @@ describe 'Troll', ->
       expect(@opts.three).toEqual 'yehaw'
       expect(@opts.four).toEqual 'awesome'
 
+    it 'guarantees that required arguments are supplied', ->
+      expect(->
+        troll = new Troll()
+        troll.setCommandLine('--one')
+        spyOn(troll, 'puts').andCallFake((args...) ->)
+        spyOn(troll, 'exit').andCallFake(-> )
+        troll.options (t) ->
+          t.opt 'one', 'Option one', required: true, type: 'String'
+      ).toThrow('--one is required')
+

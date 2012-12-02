@@ -9,7 +9,7 @@ class Options
     @parsedOpts   = {}
     @shortOpts    = {}
     @helpBanner   = ""
-    @requiredOpts = {}
+    @requiredOpts = []
 
   # ----- Public
   getParsedOpts: ->
@@ -64,7 +64,7 @@ class Options
       @parsedOpts[name]['short'] = short
 
     if _.has(opts, 'required')
-      @requiredOpts[name] = true
+      @requiredOpts.push(name)
 
   banner: (text) ->
     @helpBanner = "  #{text}"
@@ -119,14 +119,22 @@ class Options
       throw new TrollOptError("Unrecognized options '#{badOpts.join(', ')}'")
 
   validOpt: (opt) ->
-    _.contains(['desc', 'type', 'default', 'required', 'short'], opt) 
+    _.contains([ 'short', 'type', 'required', 'default' ], opt)
 
+  validateRequired: (opts) ->
+    badOpts = (opt for opt in @requiredOpts when _.has(opts, opt) isnt true)
+    if badOpts.length isnt 0
+      if badOpts.length is 1
+        throw new TrollOptError("--#{badOpts[0]} is required")
+      else
+        badOpts = ("--#{opt}" for opts in badOpts)
+        throw new TrollOptError("'#{badOpts.join(', ')}' are required")
 
 class Troll
   constructor: ->
     @opts         = new Options()
     @parsingStack   = []
-    @commandLine  = process.argv.splice(1)
+    @commandLine  = _.clone(process.argv).splice(1)
     @givenOpts    = {}
 
   # ----- Public
@@ -166,10 +174,14 @@ class Troll
     try
       @parseOptions callback
       @parse()
-      @givenOpts
-    catch UsageError
-      @usage()
-      process.exit()
+      @opts.validateRequired(@givenOpts)
+      return @givenOpts
+    catch error
+      if error instanceof UsageError
+        @usage()
+        @exit()
+      else
+        throw error
 
   parseOptions: (callback) ->
     # Parse the options without processing them
@@ -215,6 +227,9 @@ class Troll
 
   puts: (args...) ->
     console.log args...
+
+  exit: ->
+    process.exit()
 
 #(new Troll).options (t) -> 
 #  t.opt 'foo',    'Some description',               'default': true, 'short': 'F'

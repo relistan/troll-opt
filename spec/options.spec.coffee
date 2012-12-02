@@ -58,8 +58,8 @@ describe 'Options', ->
       opts = new Options()
       opts.opt 'header', 'Add a header', type: 'str', required: 'true'
 
-      expect(opts.requiredOpts['header']).toBe true
-      expect(_.has(opts.requiredOpts, 'asdf')).toBe false
+      expect(_.contains(opts.requiredOpts, 'header')).toBe true
+      expect(_.contains(opts.requiredOpts, 'asdf')).toBe false
 
   describe 'validates the passed arguments', ->
     beforeEach ->
@@ -99,6 +99,9 @@ describe 'Options', ->
     it 'raises when unknown settings are passed', ->
       expect( => @opts.opt 'header', 'Add a header', type: 'Boolean', asdf: true ).toThrow(
         'Unrecognized options \'asdf\'')
+
+    it 'raises when default and required are both specified', ->
+
 
   describe 'usage banners', ->
   
