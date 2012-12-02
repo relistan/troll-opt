@@ -247,17 +247,5 @@ class Troll
   exit: ->
     process.exit()
 
-#(new Troll).options (t) -> 
-#  t.opt 'foo',    'Some description',               'default': true, 'short': 'F'
-#  t.opt 'header', 'Some description of a non-flag', 'default': 'asdf'
-
-# Usage: foo sub_command [options]
-#   Sub commands: list, fetch. Try foo cmd --help for more options.
-#   --username, -u <s>:   Foo Username (default: asdf)
-#   --password, -p <s>:   Foo Password (default: asdf)
-#       --wsdl, -w <s>:   The Foo wsdl URL to connect to (default: http://foo)
-#           --help, -h:   Show this message
-
-
 exports.Troll   = Troll
 exports.Options = Options
