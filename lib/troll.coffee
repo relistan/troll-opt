@@ -16,6 +16,20 @@ class Options
   getBanner: ->
     @helpBanner
 
+  get: (key) ->
+    @parsedOpts[key]
+
+  has: (key) ->
+    _.has(@parsedOpts, key)
+
+  hasShort: (key) ->
+    _.has(@shortOpts, key)
+
+  takesValue: (key) ->
+    throw new TrollArgumentException('No such opt was defined!') unless @has(key)
+    @parsedOpts[key].takesValue or
+      (_.has(@shortOpts, key) and @parsedOpts[@shortOpts[key]].takesValue)
+
   opt: (name, description, opts) ->
     _.extend opts, 'desc': description
 
@@ -63,11 +77,9 @@ class Options
 
     opts
 
-
   findShortFor: (name) ->
     char = @nextAvailableCharacter(name)
     return char if char
-
     @nextAvailableCharacter('abcdefghijklmnopqrstuvwxyz')
 
   nextAvailableCharacter: (list) ->
@@ -89,31 +101,68 @@ class Options
 
 class Troll
   constructor: ->
-    @opts = new Options()
+    @opts         = new Options()
+    @parsingStack   = []
+    @commandLine  = process.argv.splice(1)
+    @givenOpts    = {}
 
   # ----- Public
+  setCommandLine: (@commandLine...) ->
+
+  getCommandLine: ->
+    @commandLine = _.flatten(x.split('=') for x in @commandLine[1..-1])
+
   parse: ->
-    @handle arg for arg in process.argv
+    @handle arg for arg in @getCommandLine()
 
   handle: (arg) ->
-    console.log arg
+    if arg is '--help'
+      throw new UsageException()
+
+    if @recognized(arg) and !@haveArgWaiting()
+      arg = @stripDashes(arg)
+
+      if @opts.hasShort(arg)
+        arg = @opts.longForShort(arg)
+
+      if @opts.takesValue(arg)
+        @parsingStack.push(arg)
+        return
+
+      # Doesn't take a value, must be a flag
+      @givenOpts[arg] = !(@opts.get(arg).default)
+
+    else if @haveArgWaiting()
+      @givenOpts[@parsingStack[0]] = arg
+      @parsingStack = []
+
+    else
+      throw new TrollArgumentException("Unknown argument: #{arg}")
 
   options: (callback) ->
+    try
+      @parseOptions callback
+      @parse()
+      @givenOpts
+    catch UsageException
+      @usage()
+      process.exit()
+
+  parseOptions: (callback) ->
+    # Parse the options without processing them
     callback @opts
-    @generate_parser
 
   getOpts: -> @opts
 
-  displayOpts: ->
-    # TODO: find out how to get the actual script name that was invoked
-    console.log "\nUsage: #{process.argv[0]} [options]"
-    console.log @opts.getBanner()
+  usage: ->
+    @puts "\nUsage: #{@commandLine[0]} [options]"
+    @puts @opts.getBanner() if @opts.getBanner().length > 0
 
     len = @opts.longestOptionLength()
     @displayOneOpt(opt, len) for opt in @opts.sorted()
+    @puts ""
 
   # ----- Private
-
   displayOneOpt: (opt, len) ->
     name = opt[0]
     opts = opt[1]
@@ -123,19 +172,30 @@ class Troll
     output += " <#{@opts.displayTypeFor(opts.type)}>" if opts.type != 'Boolean'
     output += ": #{opts.desc}"
     output += " (default: #{opts.default})" if _.has(opts, 'default')
-    console.log output
+    @puts output
 
   spacePad: (str, len) ->
     strlen = @opts.calculateOptionLength(str)
     pad = (" " for x in [strlen..len]).join("")
     "#{pad}--#{str}"
 
-  generateParser: ->
-    console.log
+  recognized: (arg) ->
+    bareArg = @stripDashes(arg)
+    (arg.match(/^--/) and @opts.has(bareArg)) or
+       (arg.match(/^-/)  and @opts.hasShort(bareArg))
 
+  stripDashes: (arg) ->
+    arg.replace(/^-+/, '')
 
-#(new Troll).parse()
-#
+  haveArgWaiting: ->
+    @parsingStack.length != 0
+
+  puts: (args...) ->
+    console.log args...
+
+class UsageException extends Error
+class TrollArgumentException extends Error
+
 #(new Troll).options (t) -> 
 #  t.opt 'foo',    'Some description',               'default': true, 'short': 'F'
 #  t.opt 'header', 'Some description of a non-flag', 'default': 'asdf'
@@ -148,5 +208,5 @@ class Troll
 #           --help, -h:   Show this message
 
 
-exports.Troll = Troll
+exports.Troll   = Troll
 exports.Options = Options

@@ -1,6 +1,5 @@
 Troll     = require('../lib/troll').Troll
 Options   = require('../lib/troll').Options
-CaptureIO = require('./helpers/captureio').CaptureIO
 util      = require('util')
 _ = require('underscore')
 
@@ -11,7 +10,7 @@ describe 'Troll', ->
       @Troll = new Troll()
     
     it 'handles more than one option', ->
-      @Troll.options (t) ->
+      @Troll.parseOptions (t) ->
         t.opt 'one', 'Option one', default: true
         t.opt 'two', 'Option two', default: true
 
@@ -19,7 +18,7 @@ describe 'Troll', ->
       expect(@Troll.getOpts().getParsedOpts().two.short).toEqual 't'
 
     it 'resolves shorthand options assigned by hand that collide', ->
-      @Troll.options (t) ->
+      @Troll.parseOptions (t) ->
         t.opt 'header', 'Add a new header', default: 'X-Shakespeare'
         t.opt 'collision', 'A colliding opt', short: 'h'
 
@@ -29,23 +28,16 @@ describe 'Troll', ->
   describe 'generating help output', ->
     beforeEach ->
       @troll = new Troll()
+      @troll.setCommandLine('test.coffee', '--one', '--three', 'yehaw', '--two')
       @troll.options (t) ->
+        t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: true
         t.opt 'three','Option three', type: 'String'
-        t.banner 'We few, we happy few, we band of brothers'
 
-      # Capture stdout so we can inspect it
-      @buffer = ""
-      capture = new CaptureIO()
-      unhook = capture.hookStdout((string, encoding, fd) =>
-        @buffer += string
-      )
+      spyOn(@troll, 'puts').andCallFake((args...) => @buffer += x for x in args)
 
-      @troll.displayOpts()
-
-      # Unhook from stdout so we get real output
-      unhook()
+      @troll.usage()
 
     it 'prints the banner', ->
       expect(@buffer).toMatch /We few, we happy few/
@@ -58,3 +50,27 @@ describe 'Troll', ->
 
     it 'gets the right spacing at the beginning of the line', ->
       expect(@buffer).toMatch /[ ]{8}--one/
+
+  describe 'parsing the command line', ->
+    beforeEach ->
+      @troll = new Troll()
+      @troll.setCommandLine(
+        'test.coffee', '--one', '--three', 'yehaw', '--two', '--four=awesome'
+      )
+
+      spyOn(@troll, 'puts').andCallFake((args...) ->)
+
+      @troll.options (t) ->
+        t.banner 'We few, we happy few, we band of brothers'
+        t.opt 'one',  'Option one', default: true
+        t.opt 'two',  'Option two', default: false
+        t.opt 'three','Option three', type: 'String'
+        t.opt 'four' ,'Option four', default: 'default for four'
+
+      @troll.usage()
+
+    it 'builds the correct object from the arguments', ->
+      expect(@troll.givenOpts.one).toBe false
+      expect(@troll.givenOpts.two).toBe true
+      expect(@troll.givenOpts.three).toEqual 'yehaw'
+      expect(@troll.givenOpts.four).toEqual 'awesome'
