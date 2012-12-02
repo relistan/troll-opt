@@ -20,7 +20,7 @@ describe 'Troll', ->
     it 'resolves shorthand options assigned by hand that collide', ->
       @Troll.parseOptions (t) ->
         t.opt 'header', 'Add a new header', default: 'X-Shakespeare'
-        t.opt 'collision', 'A colliding opt', short: 'h'
+        t.opt 'collision', 'A colliding opt', short: 'h', type: 'String'
 
       expect(@Troll.getOpts().getShortOpts()['h']).toEqual 'collision'
       expect(@Troll.getOpts().getParsedOpts()['header']['short']).toEqual 'H'

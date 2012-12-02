@@ -52,6 +52,15 @@ describe 'Options', ->
 
       expect(_.has @opts.getShortOpts(), 'a').toBe true
 
+  describe 'handles required arguments', ->
+
+    it 'detects required opts', ->
+      opts = new Options()
+      opts.opt 'header', 'Add a header', type: 'str', required: 'true'
+
+      expect(opts.requiredOpts['header']).toBe true
+      expect(_.has(opts.requiredOpts, 'asdf')).toBe false
+
   describe 'validates the passed arguments', ->
     beforeEach ->
       @opts = new Options()
@@ -82,6 +91,17 @@ describe 'Options', ->
             default: 'X-Something',
             type: 'String'
       ).toThrow('type defined when default was provided')
+
+    it 'raises when no options are set', ->
+      expect( => @opts.opt 'header', 'Add a header' ).toThrow('No options were set')
+
+    it 'raises when neither type nor default are set', ->
+      expect( => @opts.opt 'header', 'Add a header', required: true ).toThrow(
+        'Neither default nor type is set for \'header\'')
+
+    it 'raises when unknown settings are passed', ->
+      expect( => @opts.opt 'header', 'Add a header', type: 'Boolean', asdf: true ).toThrow(
+        'Unrecognized options \'asdf\'')
 
   describe 'help banners', ->
   

@@ -1,10 +1,15 @@
 _ = require 'underscore'
 
+class UsageError extends Error
+class TrollArgumentError extends Error
+class TrollOptError extends Error
+
 class Options
   constructor: ->
-    @parsedOpts = {}
-    @shortOpts  = {}
-    @helpBanner = ""
+    @parsedOpts   = {}
+    @shortOpts    = {}
+    @helpBanner   = ""
+    @requiredOpts = {}
 
   # ----- Public
   getParsedOpts: ->
@@ -26,11 +31,18 @@ class Options
     _.has(@shortOpts, key)
 
   takesValue: (key) ->
-    throw new TrollArgumentException('No such opt was defined!') unless @has(key)
+    throw new TrollArgumentError('No such opt was defined!') unless @has(key)
     @parsedOpts[key].takesValue or
-      (_.has(@shortOpts, key) and @parsedOpts[@shortOpts[key]].takesValue)
+      (@hasShort(key) and @parsedOpts[@shortOpts[key]].takesValue)
 
   opt: (name, description, opts) ->
+    throw new TrollOptError('No options were set') if _.isUndefined(opts)
+
+    unless _.has(opts, 'default') or _.has(opts, 'type')
+      throw new TrollOptError("Neither default nor type is set for '#{name}'")
+
+    @validateOpts(opts)
+
     _.extend opts, 'desc': description
 
     # Figure out whether the default type needs a value passed
@@ -51,6 +63,9 @@ class Options
       @shortOpts[short] = name
       @parsedOpts[name]['short'] = short
 
+    if _.has(opts, 'required')
+      @requiredOpts[name] = true
+
   banner: (text) ->
     @helpBanner = "  #{text}"
 
@@ -61,7 +76,7 @@ class Options
   # ----- Private
   processDefaultFor: (opts) ->
     if _.has(opts, 'default')
-      throw new Error('type defined when default was provided') if opts['type']
+      throw new TrollOptError('type defined when default was provided') if opts['type']
       if _.contains([true, false], opts.default)
         opts['type'] = 'Boolean'
       else
@@ -98,6 +113,14 @@ class Options
     lengths = (@calculateOptionLength(k) for k in _.keys(@parsedOpts))
     _.sortBy(lengths, (x) -> 0 - x)[0]
 
+  validateOpts: (opts) ->
+    badOpts = (opt for opt in _.keys(opts) when @validOpt(opt) isnt true)
+    if badOpts.length isnt 0
+      throw new TrollOptError("Unrecognized options '#{badOpts.join(', ')}'")
+
+  validOpt: (opt) ->
+    _.contains(['desc', 'type', 'default', 'required', 'short'], opt) 
+
 
 class Troll
   constructor: ->
@@ -117,7 +140,7 @@ class Troll
 
   handle: (arg) ->
     if arg is '--help'
-      throw new UsageException()
+      throw new UsageError()
 
     if @recognized(arg) and !@haveArgWaiting()
       arg = @stripDashes(arg)
@@ -137,14 +160,14 @@ class Troll
       @parsingStack = []
 
     else
-      throw new TrollArgumentException("Unknown argument: #{arg}")
+      throw new TrollArgumentError("Unknown argument: #{arg}")
 
   options: (callback) ->
     try
       @parseOptions callback
       @parse()
       @givenOpts
-    catch UsageException
+    catch UsageError
       @usage()
       process.exit()
 
@@ -192,9 +215,6 @@ class Troll
 
   puts: (args...) ->
     console.log args...
-
-class UsageException extends Error
-class TrollArgumentException extends Error
 
 #(new Troll).options (t) -> 
 #  t.opt 'foo',    'Some description',               'default': true, 'short': 'F'
