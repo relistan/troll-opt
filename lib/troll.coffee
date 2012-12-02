@@ -46,6 +46,9 @@ class Options
     unless _.has(opts, 'default') or _.has(opts, 'type')
       throw new TrollOptError("Neither default nor type is set for '#{name}'")
 
+    if _.has(opts, 'default') and _.has(opts, 'required')
+      throw new TrollOptError("Can't define both default and required on '#{name}'")
+
     @validateOpts(opts)
 
     _.extend opts, 'desc': description

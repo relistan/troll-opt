@@ -101,7 +101,9 @@ describe 'Options', ->
         'Unrecognized options \'asdf\'')
 
     it 'raises when default and required are both specified', ->
-
+      expect( => @opts.opt 'header', 'Add a header',
+        default: 'asdf', required: true).toThrow(
+        'Can\'t define both default and required on \'header\'')
 
   describe 'usage banners', ->
   
