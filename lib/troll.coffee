@@ -127,7 +127,7 @@ class Options
       if badOpts.length is 1
         throw new TrollOptError("--#{badOpts[0]} is required")
       else
-        badOpts = ("--#{opt}" for opts in badOpts)
+        badOpts = ("--#{opt}" for opt in badOpts)
         throw new TrollOptError("'#{badOpts.join(', ')}' are required")
 
 class Troll
