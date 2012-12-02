@@ -1,8 +1,6 @@
 Troll.opt
 =========
 
-(work in progress, but largely functioning)
-
 A simple command line parser in CoffeeScript for Node applications inspired
 by William Morgan's outstanding [Trollop](http://trollop.rubyforge.org/)
 library for Ruby.
@@ -32,14 +30,44 @@ Usage: app.coffee [options]
           --help: Display this text
 ```
 
-Let's pass that a command line like:
+If we pass that a command line like:
 
 ```bash
 $ coffee test.coffee --name="something" --add
 ```
 
-If we then inspect the contents of `opts` as defined above
+or:
+
+```bash
+$ coffee test.coffee --name something --add
+```
+
+or:
+
+```bash
+$ coffee test.coffee -n something -d
+```
+
+If we then inspect the contents of `opts` as defined above we see:
 
 ```coffeescript
 { name: 'something', add: true, awesome: true }
 ```
+
+Features
+--------
+
+Troll.opt, like Trollop, gives you a lot of win for not much work.  Here 
+are some of the things you get for free:
+
+ * Automatic assignment of defaults
+ * Automatic checking for required args
+ * Multiple command line syntaxes (short opts, long opts, long opts with =)
+ * Nice looking usage output
+
+Future Additions
+---------------
+
+ * Automatic type conversion as specified with type:
+ * Conversion of dashes in argument names to underscores
+ * Trollop 2.0-like --no-option and --option handling for flags
