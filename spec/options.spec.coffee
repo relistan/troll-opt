@@ -100,7 +100,7 @@ describe 'Options', ->
       expect( => @opts.opt 'header', 'Add a header', type: 'Boolean', asdf: true ).toThrow(
         'Unrecognized options \'asdf\'')
 
-  describe 'help banners', ->
+  describe 'usage banners', ->
   
     it 'can store a text argument', ->
       opts = new Options()

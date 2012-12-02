@@ -60,7 +60,7 @@ describe 'Troll', ->
 
       spyOn(@troll, 'puts').andCallFake((args...) ->)
 
-      @troll.options (t) ->
+      @opts = @troll.options (t) ->
         t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: false
@@ -70,7 +70,8 @@ describe 'Troll', ->
       @troll.usage()
 
     it 'builds the correct object from the arguments', ->
-      expect(@troll.givenOpts.one).toBe false
-      expect(@troll.givenOpts.two).toBe true
-      expect(@troll.givenOpts.three).toEqual 'yehaw'
-      expect(@troll.givenOpts.four).toEqual 'awesome'
+      expect(@opts.one).toBe false
+      expect(@opts.two).toBe true
+      expect(@opts.three).toEqual 'yehaw'
+      expect(@opts.four).toEqual 'awesome'
+
