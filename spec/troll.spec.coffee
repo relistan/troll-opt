@@ -57,6 +57,9 @@ describe 'Troll', ->
     it 'shows which options are required', ->
       expect(@buffer).toMatch /Option three \(required\)/
 
+    it 'adds the --help flag to the output', ->
+      expect(@buffer).toMatch /--help/
+
   describe 'parsing the command line', ->
     beforeEach ->
       @troll = new Troll()
