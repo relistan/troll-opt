@@ -85,11 +85,8 @@ describe 'Options', ->
       expect(@opts.getParsedOpts().silent.type).toEqual 'Boolean'
 
     it 'raises when the type was set and a default was provided', ->
-      expect( ->
-          opts = new Options()
-          opts.opt 'header', 'Add a header',
-            default: 'X-Something',
-            type: 'String'
+      expect( =>
+          @opts.opt 'header', 'Add a header', default: 'X-Something', type: 'String'
       ).toThrow('type defined when default was provided')
 
     it 'raises when no options are set', ->
