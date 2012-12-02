@@ -36,24 +36,20 @@ class Options
     _.has(@shortOpts, key)
 
   longForShort: (short) ->
-    throw new TrollArgumentError("No such opt was defined! (#{short})") unless @hasShort(short)
+    unless @hasShort(short)
+      throw new TrollArgumentError("No such opt was defined! (#{short})")
+
     @parsedOpts[@shortOpts[short]]
 
   takesValue: (key) ->
-    throw new TrollArgumentError("No such opt was defined! (#{key})") unless @has(key)
+    unless @has(key)
+      throw new TrollArgumentError("No such opt was defined! (#{key})")
+
     @parsedOpts[key].takesValue or
       (@hasShort(key) and @parsedOpts[@shortOpts[key]].takesValue)
 
   opt: (name, description, opts) ->
-    throw new TrollOptError('No options were set') if _.isUndefined(opts)
-
-    unless _.has(opts, 'default') or _.has(opts, 'type')
-      throw new TrollOptError("Neither default nor type is set for '#{name}'")
-
-    if _.has(opts, 'default') and _.has(opts, 'required')
-      throw new TrollOptError("Can't define both default and required on '#{name}'")
-
-    @validateOpts(opts)
+    @validateOpts(name, opts)
 
     _.extend opts, 'desc': description
 
@@ -125,8 +121,16 @@ class Options
     lengths = (@calculateOptionLength(k) for k in _.keys(@parsedOpts))
     _.sortBy(lengths, (x) -> 0 - x)[0]
 
-  validateOpts: (opts) ->
-    badOpts = (opt for opt in _.keys(opts) when @validOpt(opt) isnt true)
+  validateOpts: (name, opts) ->
+    throw new TrollOptError('No options were set') if _.isUndefined(opts)
+
+    unless _.has(opts, 'default') or _.has(opts, 'type')
+      throw new TrollOptError("Neither default nor type is set for '#{name}'")
+
+    if _.has(opts, 'default') and _.has(opts, 'required')
+      throw new TrollOptError("Can't define both default and required on '#{name}'")
+
+    badOpts = (opt for opt in _.keys(opts) when @validOpt(opt) is false)
     if badOpts.length isnt 0
       throw new TrollOptError("Unrecognized options '#{badOpts.join(', ')}'")
 
@@ -145,7 +149,7 @@ class Options
 class Troll
   constructor: ->
     @opts         = new Options()
-    @parsingStack   = []
+    @parsingStack = []
     @commandLine  = _.clone(process.argv).splice(1)
     @givenOpts    = {}
 
