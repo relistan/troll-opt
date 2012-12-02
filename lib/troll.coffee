@@ -1,8 +1,13 @@
 _ = require 'underscore'
 
+# Define some custom error classes. For internal signalling.
+# Note: these swallow file and line number info!
 class UsageError extends Error
+  constructor: (@message, ignored...) ->
 class TrollArgumentError extends Error
+  constructor: (@message, ignored...) ->
 class TrollOptError extends Error
+  constructor: (@message, ignored...) ->
 
 class Options
   constructor: ->
