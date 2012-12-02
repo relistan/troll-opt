@@ -35,8 +35,12 @@ class Options
   hasShort: (key) ->
     _.has(@shortOpts, key)
 
+  longForShort: (short) ->
+    throw new TrollArgumentError("No such opt was defined! (#{short})") unless @hasShort(short)
+    @parsedOpts[@shortOpts[short]]
+
   takesValue: (key) ->
-    throw new TrollArgumentError('No such opt was defined!') unless @has(key)
+    throw new TrollArgumentError("No such opt was defined! (#{key})") unless @has(key)
     @parsedOpts[key].takesValue or
       (@hasShort(key) and @parsedOpts[@shortOpts[key]].takesValue)
 
@@ -202,7 +206,10 @@ class Troll
     @puts @opts.getBanner() if @opts.getBanner().length > 0
 
     len = @opts.longestOptionLength()
+    len = 6 if len < '--help'.length
+
     @displayOneOpt(opt, len) for opt in @opts.sorted()
+    @puts (" " for x in [1..len+2]).join("") + "--help: Display this help text"
     @puts ""
 
   # ----- Private
