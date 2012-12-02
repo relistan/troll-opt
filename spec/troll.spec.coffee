@@ -75,14 +75,16 @@ describe 'Troll', ->
         t.opt 'two',  'Option two', default: false
         t.opt 'three','Option three', type: 'String'
         t.opt 'four' ,'Option four', default: 'default for four'
-
-      @troll.usage()
+        t.opt 'five' ,'Option five', default: 'default for five'
 
     it 'builds the correct object from the arguments', ->
       expect(@opts.one).toBe false
       expect(@opts.two).toBe true
       expect(@opts.three).toEqual 'yehaw'
       expect(@opts.four).toEqual 'awesome'
+
+    it 'sets defaults for options that have them and are not defined on the cli', ->
+      expect(@opts.five).toEqual 'default for five'
 
     it 'guarantees that required arguments are supplied', ->
       expect(->

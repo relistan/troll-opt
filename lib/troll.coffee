@@ -81,6 +81,9 @@ class Options
     return k.length if @parsedOpts[k].type is 'Boolean'
     k.length + 4
 
+  optsWithDefaults: ->
+    opt for opt in _.keys(@parsedOpts) when _.has(@parsedOpts[opt], 'default')
+
   # ----- Private
   processDefaultFor: (opts) ->
     if _.has(opts, 'default')
@@ -161,6 +164,7 @@ class Troll
 
   parse: ->
     @handle arg for arg in @getCommandLine()
+    @setDefaultValue(opt) for opt in @opts.optsWithDefaults()
 
   handle: (arg) ->
     if arg is '--help'
@@ -244,6 +248,10 @@ class Troll
 
   haveArgWaiting: ->
     @parsingStack.length != 0
+
+  setDefaultValue: (opt) ->
+    optSpec =  @opts.getParsedOpts()[opt]
+    @givenOpts[opt] = optSpec.default unless _.has(@givenOpts, opt)
 
   puts: (args...) ->
     console.log args...
