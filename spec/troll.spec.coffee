@@ -97,7 +97,7 @@ describe 'Troll', ->
         troll.options (t) ->
           t.opt 'one', 'Option one', required: true, type: 'String'
 
-      ).toThrow('--one is required')
+      ).toThrow('--one is required. Try --help for more info.')
 
     it 'handles short options just like long ones', ->
       @troll.parseOptions (t) ->

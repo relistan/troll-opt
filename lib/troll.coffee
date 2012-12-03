@@ -144,10 +144,10 @@ class Options
     badOpts = (opt for opt in @requiredOpts when _.has(opts, opt) isnt true)
     if badOpts.length isnt 0
       if badOpts.length is 1
-        throw new TrollOptError("--#{badOpts[0]} is required")
+        throw new TrollOptError("--#{badOpts[0]} is required. Try --help for more info.")
       else
         badOpts = ("--#{opt}" for opt in badOpts)
-        throw new TrollOptError("'#{badOpts.join(', ')}' are required")
+        throw new TrollOptError("'#{badOpts.join(', ')}' are required. Try --help for more info.")
 
 class Troll
   constructor: ->
