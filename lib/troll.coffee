@@ -39,7 +39,7 @@ class Options
     unless @hasShort(short)
       throw new TrollArgumentError("No such opt was defined! (#{short})")
 
-    @parsedOpts[@shortOpts[short]]
+    @shortOpts[short]
 
   takesValue: (key) ->
     unless @has(key)

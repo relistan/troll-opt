@@ -105,6 +105,10 @@ describe 'Options', ->
         default: 'asdf', required: true).toThrow(
         'Can\'t define both default and required on \'header\'')
 
+  describe 'working with multi-word options', ->
+
+    it 'converts mid-option dashes to underscores', ->
+
   describe 'usage banners', ->
   
     it 'can store a text argument', ->

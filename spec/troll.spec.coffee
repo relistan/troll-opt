@@ -99,3 +99,13 @@ describe 'Troll', ->
 
       ).toThrow('--one is required')
 
+    it 'handles short options just like long ones', ->
+      @troll.parseOptions (t) ->
+        t.opt 'one', 'Option one', type: 'String'
+        t.opt 'two', 'Option two', default: true
+
+      @troll.setCommandLine('test.coffee', '-o', 'shakespeare')
+      expect(_.has(@troll.givenOpts, 'one')).toBe true
+
+    it 'does type conversion to the desired type', ->
+
