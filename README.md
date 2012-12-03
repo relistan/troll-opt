@@ -61,8 +61,9 @@ Troll.opt, like Trollop, gives you a lot of win for not much work.  Here
 are some of the things you get for free:
 
  * Automatic assignment of defaults
+ * Automatic assignment of short flags (e.g. -n for --now)
  * Automatic checking for required args
- * Multiple command line syntaxes (short opts, long opts, long opts with =)
+ * Multiple command line syntaxes (getopt short, getopt long with and without =)
  * Nice looking usage output
 
 Future Additions
