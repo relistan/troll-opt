@@ -100,12 +100,19 @@ describe 'Troll', ->
       ).toThrow('--one is required. Try --help for more info.')
 
     it 'handles short options just like long ones', ->
-      @troll.parseOptions (t) ->
-        t.opt 'one', 'Option one', type: 'String'
-        t.opt 'two', 'Option two', default: true
-
+      @troll = new Troll()
       @troll.setCommandLine('test.coffee', '-o', 'shakespeare')
+      @troll.options (t) =>
+        t.opt 'one', 'Option one', type: 'String'
+
       expect(_.has(@troll.givenOpts, 'one')).toBe true
+
+    it 'raises if the same argument is passed more than once', ->
+      @troll.setCommandLine('test.coffee', '-o', 'shakespeare', '-o', 'foo')
+      expect(=>
+        @troll.options (t) ->
+          t.opt 'one', 'Option one', type: 'String'
+      ).toThrow('--one specified twice!')
 
     it 'does type conversion to the desired type', ->
 

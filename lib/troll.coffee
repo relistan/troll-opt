@@ -176,6 +176,9 @@ class Troll
       if @opts.hasShort(arg)
         arg = @opts.longForShort(arg)
 
+      if _.has(@givenOpts, arg)
+        throw new TrollArgumentError("--#{arg} specified twice!")
+
       if @opts.takesValue(arg)
         @parsingStack.push(arg)
         return
