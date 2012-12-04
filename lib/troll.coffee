@@ -187,6 +187,8 @@ class Troll
       @givenOpts[arg] = !(@opts.get(arg).default)
 
     else if @haveArgWaiting()
+      arg = @convert(@parsingStack[0], arg)
+
       @givenOpts[@parsingStack[0]] = arg
       @parsingStack = []
 
@@ -255,6 +257,19 @@ class Troll
   setDefaultValue: (opt) ->
     optSpec =  @opts.getParsedOpts()[opt]
     @givenOpts[opt] = optSpec.default unless _.has(@givenOpts, opt)
+
+  convert: (opt, value) ->
+    type = @opts.get(opt).type
+    retValue = switch type
+      when 'Integer' then parseInt(value)
+      when 'Float'   then parseFloat(value)
+      when 'String'  then value
+
+    if _.contains([ 'Integer', 'Float' ], type) and !(retValue > 0) and !(retValue < 0)
+      throw new TrollArgumentError("#{opt} has an invalid value supplied!  Must be a #{type}")
+
+    retValue
+
 
   puts: (args...) ->
     console.log args...

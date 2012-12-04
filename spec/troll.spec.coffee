@@ -64,7 +64,7 @@ describe 'Troll', ->
     beforeEach ->
       @troll = new Troll()
       @troll.setCommandLine(
-        'test.coffee', '--one', '--three', 'yehaw', '--two', '--four=awesome'
+        'test.coffee', '--one', '--three', '1', '--two', '--four=1'
       )
 
       spyOn(@troll, 'puts').andCallFake((args...) ->)
@@ -73,15 +73,15 @@ describe 'Troll', ->
         t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: false
-        t.opt 'three','Option three', type: 'String'
+        t.opt 'three','Option three', type: 'Integer'
         t.opt 'four' ,'Option four', default: 'default for four'
         t.opt 'five' ,'Option five', default: 'default for five'
 
     it 'builds the correct object from the arguments', ->
       expect(@opts.one).toBe false
       expect(@opts.two).toBe true
-      expect(@opts.three).toEqual 'yehaw'
-      expect(@opts.four).toEqual 'awesome'
+      expect(@opts.three).toEqual 1
+      expect(@opts.five).toEqual 'default for five'
 
     it 'sets defaults for options that have them and are not defined on the cli', ->
       expect(@opts.five).toEqual 'default for five'
@@ -115,4 +115,6 @@ describe 'Troll', ->
       ).toThrow('--one specified twice!')
 
     it 'does type conversion to the desired type', ->
+      expect(@opts.three).toEqual 1
 
+    it 'raises when the argument supplied is of the wrong type', ->
