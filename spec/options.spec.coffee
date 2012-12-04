@@ -56,7 +56,7 @@ describe 'Options', ->
 
     it 'detects required opts', ->
       opts = new Options()
-      opts.opt 'header', 'Add a header', type: 'str', required: 'true'
+      opts.opt 'header', 'Add a header', type: 'String', required: 'true'
 
       expect(_.contains(opts.requiredOpts, 'header')).toBe true
       expect(_.contains(opts.requiredOpts, 'asdf')).toBe false
@@ -66,7 +66,7 @@ describe 'Options', ->
       @opts = new Options()
 
     it 'requires an argument if type is defined', ->
-      @opts.opt 'header', 'Add a header', type: 'str'
+      @opts.opt 'header', 'Add a header', type: 'String'
       expect(@opts.getParsedOpts().header.takesValue).toBe true
 
     it 'does not require an argument if type is undefined and default is a boolean', ->
@@ -104,6 +104,9 @@ describe 'Options', ->
       expect( => @opts.opt 'header', 'Add a header',
         default: 'asdf', required: true).toThrow(
         'Can\'t define both default and required on \'header\'')
+
+    it 'raises when an invalid type is specified', ->
+      expect( => @opts.opt 'header', 'Add one', type: 'asdf' ).toThrow('Invalid type: asdf')
 
   describe 'working with multi-word options', ->
 

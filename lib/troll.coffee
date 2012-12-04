@@ -74,6 +74,8 @@ class Options
     if _.has(opts, 'required')
       @requiredOpts.push(name)
 
+    @validateTypeFor(opts)
+
   banner: (text) ->
     @helpBanner = "  #{text}"
 
@@ -148,6 +150,10 @@ class Options
       else
         badOpts = ("--#{opt}" for opt in badOpts)
         throw new TrollOptError("'#{badOpts.join(', ')}' are required. Try --help for more info.")
+
+  validateTypeFor: (opt) ->
+    unless _.contains(['String', 'Boolean', 'Integer', 'Float'], opt.type)
+      throw new TrollOptError("Invalid type: #{opt.type}")
 
 class Troll
   constructor: ->
