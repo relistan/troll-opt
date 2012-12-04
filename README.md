@@ -63,12 +63,12 @@ are some of the things you get for free:
  * Automatic assignment of defaults
  * Automatic assignment of short flags (e.g. -n for --now)
  * Automatic checking for required args
+ * Automatic type conversion for basic types
  * Multiple command line syntaxes (getopt short, getopt long with and without =)
  * Nice looking usage output
 
 Future Additions
 ---------------
 
- * Automatic type conversion as specified with type:
  * Conversion of dashes in argument names to underscores
  * Trollop 2.0-like --no-option and --option handling for flags
