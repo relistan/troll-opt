@@ -1,5 +1,4 @@
-Troll     = require('../lib/troll').Troll
-Options   = require('../lib/troll').Options
+Troll     = require('../src/troll').Troll
 util      = require('util')
 _ = require('underscore')
 

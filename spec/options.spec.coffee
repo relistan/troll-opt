@@ -1,4 +1,4 @@
-Options = require('../lib/troll').Options
+Options = require('../src/troll').Options
 _ = require('underscore')
 
 describe 'Options', ->
