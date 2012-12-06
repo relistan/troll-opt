@@ -27,7 +27,7 @@ opts = (new Troll()).options(function(troll) {
   troll.banner('Totally rad app that does something cool');
   troll.opt('awesome', 'Turn on the awesome', { default: true });
   troll.opt('name',    'The name of the application', { type: 'String', required: true });
-  troll.opt('add',     'Add some more awesome', { short: 'd' });
+  troll.opt('add',     'Add some more awesome', { short: 'd', default: true });
 });
 ```
 
