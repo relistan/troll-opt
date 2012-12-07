@@ -155,23 +155,20 @@ class Options
     unless _.contains(['string', 'boolean', 'integer', 'float', 'number'], opt.type)
       throw new TrollOptError("Invalid type: #{opt.type}")
 
-class Troll
-  constructor: ->
-    @opts         = new Options()
+
+class Parser
+  constructor: (opts) ->
     @parsingStack = []
-    @commandLine  = _.clone(process.argv).splice(1)
     @givenOpts    = {}
+    @opts = opts
 
   # ----- Public
-  setCommandLine: (@commandLine...) ->
-
-  getCommandLine: ->
-    @commandLine = _.flatten(x.split('=') for x in @commandLine[1..-1])
-
-  parse: ->
-    @handle arg for arg in @getCommandLine()
+  parse: (commandLine) ->
+    @handle arg for arg in commandLine
     @setDefaultValue(opt) for opt in @opts.optsWithDefaults()
+    @givenOpts
 
+  # ----- Private
   handle: (arg) ->
     if arg is '--help'
       throw new UsageError()
@@ -201,12 +198,65 @@ class Troll
     else
       throw new TrollArgumentError("Unknown argument: #{arg}")
 
+  recognized: (arg) ->
+    bareArg = @stripDashes(arg)
+    (arg.match(/^--/) and @opts.has(bareArg)) or
+       (arg.match(/^-/)  and @opts.hasShort(bareArg))
+
+  stripDashes: (arg) ->
+    arg.replace(/^-+/, '')
+
+  haveArgWaiting: ->
+    @parsingStack.length != 0
+
+  setDefaultValue: (opt) ->
+    optSpec =  @opts.getParsedOpts()[opt]
+    @givenOpts[opt] = optSpec.default unless _.has(@givenOpts, opt)
+
+  isInt: (n) ->
+    typeof n is 'number' and (n % 1 == 0)
+
+  convert: (opt, value) ->
+    type = @opts.get(opt).type
+    retValue = switch type.toLowerCase()
+      when 'integer' then parseInt(value)
+      when 'float'   then parseFloat(value)
+      when 'number'  then @convertNumber(number)
+      when 'string'  then value
+
+    if _.contains([ 'integer', 'float', 'number' ], type.toLowerCase()) and !(retValue > 0) and !(retValue < 0)
+      throw new TrollArgumentError("#{opt} has an invalid value supplied!  Must be a #{type}")
+
+    retValue
+
+  convertNumber: (value) ->
+    if isInt(value)
+      parseInt(value)
+    else
+      parseFloat(value)
+
+
+class Troll
+  constructor: ->
+    @opts         = new Options()
+    @commandLine  = _.clone(process.argv).splice(1)
+    @parser       = new Parser(@opts)
+
+  # ----- Public
+  setCommandLine: (@commandLine...) ->
+
+  getCommandLine: ->
+    @commandLine = _.flatten(x.split('=') for x in @commandLine[1..-1])
+
+  getGivenOpts: ->
+    @parser.givenOpts
+
   options: (callback) ->
     try
       @parseOptions callback
-      @parse()
-      @opts.validateRequired(@givenOpts)
-      return @givenOpts
+      givenOpts = @parser.parse(@getCommandLine())
+      @opts.validateRequired(givenOpts)
+      return givenOpts
     catch error
       if error instanceof UsageError
         @usage()
@@ -249,42 +299,6 @@ class Troll
     pad = (" " for x in [strlen..len]).join("")
     "#{pad}--#{str}"
 
-  recognized: (arg) ->
-    bareArg = @stripDashes(arg)
-    (arg.match(/^--/) and @opts.has(bareArg)) or
-       (arg.match(/^-/)  and @opts.hasShort(bareArg))
-
-  stripDashes: (arg) ->
-    arg.replace(/^-+/, '')
-
-  haveArgWaiting: ->
-    @parsingStack.length != 0
-
-  setDefaultValue: (opt) ->
-    optSpec =  @opts.getParsedOpts()[opt]
-    @givenOpts[opt] = optSpec.default unless _.has(@givenOpts, opt)
-
-  isInt: (n) ->
-    typeof n is 'number' and (n % 1 == 0)
-
-  convert: (opt, value) ->
-    type = @opts.get(opt).type
-    retValue = switch type.toLowerCase()
-      when 'integer' then parseInt(value)
-      when 'float'   then parseFloat(value)
-      when 'number'  then @convertNumber(number)
-      when 'string'  then value
-
-    if _.contains([ 'integer', 'float', 'number' ], type.toLowerCase()) and !(retValue > 0) and !(retValue < 0)
-      throw new TrollArgumentError("#{opt} has an invalid value supplied!  Must be a #{type}")
-
-    retValue
-
-  convertNumber: (value) ->
-    if isInt(value)
-      parseInt(value)
-    else
-      parseFloat(value)
 
   puts: (args...) ->
     console.log args...

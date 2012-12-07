@@ -104,7 +104,7 @@ describe 'Troll', ->
       @troll.options (t) =>
         t.opt 'one', 'Option one', type: 'string'
 
-      expect(_.has(@troll.givenOpts, 'one')).toBe true
+      expect(_.has(@troll.getGivenOpts(), 'one')).toBe true
 
     it 'raises if the same argument is passed more than once', ->
       @troll.setCommandLine('test.coffee', '-o', 'shakespeare', '-o', 'foo')
