@@ -19,7 +19,7 @@ describe 'Troll', ->
     it 'resolves shorthand options assigned by hand that collide', ->
       @troll.parseOptions (t) ->
         t.opt 'header', 'Add a new header', default: 'X-Shakespeare'
-        t.opt 'collision', 'A colliding opt', short: 'h', type: 'String'
+        t.opt 'collision', 'A colliding opt', short: 'h', type: 'string'
 
       expect(@troll.getOpts().getShortOpts()['h']).toEqual 'collision'
       expect(@troll.getOpts().getParsedOpts()['header']['short']).toEqual 'H'
@@ -32,7 +32,7 @@ describe 'Troll', ->
         t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: true
-        t.opt 'three','Option three', type: 'String', required: true
+        t.opt 'three','Option three', type: 'string', required: true
 
       spyOn(@troll, 'puts').andCallFake((args...) => @buffer += x for x in args)
 
@@ -72,7 +72,7 @@ describe 'Troll', ->
         t.banner 'We few, we happy few, we band of brothers'
         t.opt 'one',  'Option one', default: true
         t.opt 'two',  'Option two', default: false
-        t.opt 'three','Option three', type: 'Integer'
+        t.opt 'three','Option three', type: 'integer'
         t.opt 'four' ,'Option four', default: 'default for four'
         t.opt 'five' ,'Option five', default: 'default for five'
 
@@ -94,7 +94,7 @@ describe 'Troll', ->
         spyOn(troll, 'exit').andCallFake(-> )
 
         troll.options (t) ->
-          t.opt 'one', 'Option one', required: true, type: 'String'
+          t.opt 'one', 'Option one', required: true, type: 'string'
 
       ).toThrow('--one is required. Try --help for more info.')
 
@@ -102,7 +102,7 @@ describe 'Troll', ->
       @troll = new Troll()
       @troll.setCommandLine('test.coffee', '-o', 'shakespeare')
       @troll.options (t) =>
-        t.opt 'one', 'Option one', type: 'String'
+        t.opt 'one', 'Option one', type: 'string'
 
       expect(_.has(@troll.givenOpts, 'one')).toBe true
 
@@ -110,7 +110,7 @@ describe 'Troll', ->
       @troll.setCommandLine('test.coffee', '-o', 'shakespeare', '-o', 'foo')
       expect(=>
         @troll.options (t) ->
-          t.opt 'one', 'Option one', type: 'String'
+          t.opt 'one', 'Option one', type: 'string'
       ).toThrow('--one specified twice!')
 
     it 'does type conversion to the desired type', ->

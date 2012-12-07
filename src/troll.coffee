@@ -80,7 +80,7 @@ class Options
     @helpBanner = "  #{text}"
 
   calculateOptionLength: (k) ->
-    return k.length if @parsedOpts[k].type is 'Boolean'
+    return k.length if @parsedOpts[k].type is 'boolean'
     k.length + 4
 
   optsWithDefaults: ->
@@ -91,14 +91,14 @@ class Options
     if _.has(opts, 'default')
       throw new TrollOptError('type defined when default was provided') if opts['type']
       if _.contains([true, false], opts.default)
-        opts['type'] = 'Boolean'
+        opts['type'] = 'boolean'
       else
-        opts['type'] = opts['default'].constructor.name
+        opts['type'] = typeof opts['default']
 
     opts
 
   processFlagOrOptFor: (opts) ->
-    if _.has(opts, 'type') and opts.type != 'Boolean'
+    if _.has(opts, 'type') and opts.type != 'boolean'
       opts['takesValue'] = true
     else
       opts['takesValue'] = false
@@ -152,7 +152,7 @@ class Options
         throw new TrollOptError("'#{badOpts.join(', ')}' are required. Try --help for more info.")
 
   validateTypeFor: (opt) ->
-    unless _.contains(['String', 'Boolean', 'Integer', 'Float'], opt.type)
+    unless _.contains(['string', 'boolean', 'integer', 'float', 'number'], opt.type)
       throw new TrollOptError("Invalid type: #{opt.type}")
 
 class Troll
@@ -238,7 +238,7 @@ class Troll
 
     output =  @spacePad("#{name}", len + 1)
     output += ", -#{opts.short}"
-    output += " <#{@opts.displayTypeFor(opts.type)}>" if opts.type != 'Boolean'
+    output += " <#{@opts.displayTypeFor(opts.type)}>" if opts.type != 'boolean'
     output += ": #{opts.desc}"
     output += " (default: #{opts.default})" if _.has(opts, 'default')
     output += " (required)" if _.has(opts, 'required') and opts.required
@@ -264,18 +264,27 @@ class Troll
     optSpec =  @opts.getParsedOpts()[opt]
     @givenOpts[opt] = optSpec.default unless _.has(@givenOpts, opt)
 
+  isInt: (n) ->
+    typeof n is 'number' and (n % 1 == 0)
+
   convert: (opt, value) ->
     type = @opts.get(opt).type
-    retValue = switch type
-      when 'Integer' then parseInt(value)
-      when 'Float'   then parseFloat(value)
-      when 'String'  then value
+    retValue = switch type.toLowerCase()
+      when 'integer' then parseInt(value)
+      when 'float'   then parseFloat(value)
+      when 'number'  then @convertNumber(number)
+      when 'string'  then value
 
-    if _.contains([ 'Integer', 'Float' ], type) and !(retValue > 0) and !(retValue < 0)
+    if _.contains([ 'integer', 'float', 'number' ], type.toLowerCase()) and !(retValue > 0) and !(retValue < 0)
       throw new TrollArgumentError("#{opt} has an invalid value supplied!  Must be a #{type}")
 
     retValue
 
+  convertNumber: (value) ->
+    if isInt(value)
+      parseInt(value)
+    else
+      parseFloat(value)
 
   puts: (args...) ->
     console.log args...

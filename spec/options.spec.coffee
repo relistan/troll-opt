@@ -56,7 +56,7 @@ describe 'Options', ->
 
     it 'detects required opts', ->
       opts = new Options()
-      opts.opt 'header', 'Add a header', type: 'String', required: 'true'
+      opts.opt 'header', 'Add a header', type: 'string', required: 'true'
 
       expect(_.contains(opts.requiredOpts, 'header')).toBe true
       expect(_.contains(opts.requiredOpts, 'asdf')).toBe false
@@ -66,7 +66,7 @@ describe 'Options', ->
       @opts = new Options()
 
     it 'requires an argument if type is defined', ->
-      @opts.opt 'header', 'Add a header', type: 'String'
+      @opts.opt 'header', 'Add a header', type: 'string'
       expect(@opts.getParsedOpts().header.takesValue).toBe true
 
     it 'does not require an argument if type is undefined and default is a boolean', ->
@@ -79,14 +79,14 @@ describe 'Options', ->
 
     it 'sets the right type based on the provided default', ->
       @opts.opt 'header', 'Add a header', default: 'X-Something'
-      expect(@opts.getParsedOpts().header.type).toEqual 'String'
+      expect(@opts.getParsedOpts().header.type).toEqual 'string'
 
       @opts.opt 'silent', 'Enable silent mode', default: false
-      expect(@opts.getParsedOpts().silent.type).toEqual 'Boolean'
+      expect(@opts.getParsedOpts().silent.type).toEqual 'boolean'
 
     it 'raises when the type was set and a default was provided', ->
       expect( =>
-          @opts.opt 'header', 'Add a header', default: 'X-Something', type: 'String'
+          @opts.opt 'header', 'Add a header', default: 'X-Something', type: 'string'
       ).toThrow('type defined when default was provided')
 
     it 'raises when no options are set', ->
@@ -97,7 +97,7 @@ describe 'Options', ->
         'Neither default nor type is set for \'header\'')
 
     it 'raises when unknown settings are passed', ->
-      expect( => @opts.opt 'header', 'Add a header', type: 'Boolean', asdf: true ).toThrow(
+      expect( => @opts.opt 'header', 'Add a header', type: 'boolean', asdf: true ).toThrow(
         'Unrecognized options \'asdf\'')
 
     it 'raises when default and required are both specified', ->
