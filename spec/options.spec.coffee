@@ -84,6 +84,10 @@ describe 'Options', ->
       @opts.opt 'silent', 'Enable silent mode', default: false
       expect(@opts.getParsedOpts().silent.type).toEqual 'boolean'
 
+    it 'set the type to boolean when neither type nor default are set', ->
+      @opts.opt 'header', 'Add a header', required: true
+      expect(@opts.getParsedOpts().header.type).toEqual 'boolean'
+
     it 'raises when the type was set and a default was provided', ->
       expect( =>
           @opts.opt 'header', 'Add a header', default: 'X-Something', type: 'string'
@@ -91,10 +95,6 @@ describe 'Options', ->
 
     it 'raises when no options are set', ->
       expect( => @opts.opt 'header', 'Add a header' ).toThrow('No options were set')
-
-    it 'raises when neither type nor default are set', ->
-      expect( => @opts.opt 'header', 'Add a header', required: true ).toThrow(
-        'Neither default nor type is set for \'header\'')
 
     it 'raises when unknown settings are passed', ->
       expect( => @opts.opt 'header', 'Add a header', type: 'boolean', asdf: true ).toThrow(
