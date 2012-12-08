@@ -4,13 +4,13 @@
   "contributors": [ 
     {
       "name":  "Karl Matthias",
-      "email": "relistan+troll.opt@gmail.com"
+      "email": "relistan+troll-opt@gmail.com"
     } 
   ],
-  "version": "0.5.0",
+  "version": "0.5.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/relistan/troll.opt"
+    "url": "https://github.com/relistan/troll-opt"
   },
   "engines": {
     "node": ">=0.6"
