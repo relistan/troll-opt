@@ -1,2 +1,2 @@
 script:
-  cake build
+  ./node_modules/.bin/cake build
