@@ -22,7 +22,7 @@ Or, a slightly more complicated definition that takes
 three different arguments and defines a help banner:
 
 ```javascript
-Troll = require('troll').Troll
+Troll = require('troll-opt').Troll
 
 opts = (new Troll()).options(function(troll) {
   troll.banner('Totally rad app that does something cool');
