@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/relistan/troll.opt.png)](https://travis-ci.org/relistan/troll.opt)
-Troll.opt
+[![Build Status](https://travis-ci.org/relistan/troll-opt.png)](https://travis-ci.org/relistan/troll-opt)
+Troll-opt
 =========
 
 A powerful-but-simple command line parser in CoffeeScript for Node.js
 apps inspired by William Morgan's awesome
 [Trollop](http://trollop.rubyforge.org/) gem for Ruby.
 
-Troll.opt allows you to define and parse command line args in one
+Troll-opt allows you to define and parse command line args in one
 simple definition. One line per opt: that's all you need. No chaining
 long series of commands together, no multiline parsing definitions.
 
@@ -71,7 +71,7 @@ If we then inspect the contents of `opts` as defined above we see:
 Features
 --------
 
-Troll.opt, like Trollop, gives you a lot of win for not much work.  Here 
+Troll-opt, like Trollop, gives you a lot of win for not much work.  Here 
 are some of the things you get for free:
 
  * Automatic assignment of defaults
