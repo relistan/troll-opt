@@ -1,2 +1,0 @@
-script:
-  ./node_modules/.bin/cake build

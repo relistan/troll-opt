@@ -19,6 +19,7 @@
   "devDependencies": { "jasmine-node": ">=1.0.26", "fs": "latest", "coffee-script": "latest" },
   "scripts": {
     "test": "./node_modules/.bin/cake test"
+    "install": "./node_modules/.bin/cake build"
   },
   "bin": {},
   "license": "MIT"
