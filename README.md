@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/relistan/troll.opt.png)](https://travis-ci.org/relistan/troll.opt)
 Troll.opt
 =========
 
