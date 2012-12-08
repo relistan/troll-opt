@@ -2,3 +2,4 @@
 *.swo
 .rbenv-version
 lib/
+node_modules/
