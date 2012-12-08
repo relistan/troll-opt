@@ -60,30 +60,6 @@ describe 'Troll', ->
       expect(@buffer).toMatch /--help/
 
   describe 'parsing the command line', ->
-    beforeEach ->
-      @troll = new Troll()
-      @troll.setCommandLine(
-        'test.coffee', '--one', '--three', '1', '--two', '--four=1'
-      )
-
-      spyOn(@troll, 'puts').andCallFake((args...) ->)
-
-      @opts = @troll.options (t) ->
-        t.banner 'We few, we happy few, we band of brothers'
-        t.opt 'one',  'Option one', default: true
-        t.opt 'two',  'Option two', default: false
-        t.opt 'three','Option three', type: 'integer'
-        t.opt 'four' ,'Option four', default: 'default for four'
-        t.opt 'five' ,'Option five', default: 'default for five'
-
-    it 'builds the correct object from the arguments', ->
-      expect(@opts.one).toBe false
-      expect(@opts.two).toBe true
-      expect(@opts.three).toEqual 1
-      expect(@opts.five).toEqual 'default for five'
-
-    it 'sets defaults for options that have them and are not defined on the cli', ->
-      expect(@opts.five).toEqual 'default for five'
 
     it 'guarantees that required arguments are supplied', ->
       expect(->
@@ -97,23 +73,3 @@ describe 'Troll', ->
           t.opt 'one', 'Option one', required: true, type: 'string'
 
       ).toThrow('--one is required. Try --help for more info.')
-
-    it 'handles short options just like long ones', ->
-      @troll = new Troll()
-      @troll.setCommandLine('test.coffee', '-o', 'shakespeare')
-      @troll.options (t) =>
-        t.opt 'one', 'Option one', type: 'string'
-
-      expect(_.has(@troll.getGivenOpts(), 'one')).toBe true
-
-    it 'raises if the same argument is passed more than once', ->
-      @troll.setCommandLine('test.coffee', '-o', 'shakespeare', '-o', 'foo')
-      expect(=>
-        @troll.options (t) ->
-          t.opt 'one', 'Option one', type: 'string'
-      ).toThrow('--one specified twice!')
-
-    it 'does type conversion to the desired type', ->
-      expect(@opts.three).toEqual 1
-
-    it 'raises when the argument supplied is of the wrong type', ->

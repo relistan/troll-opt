@@ -164,7 +164,7 @@ class Parser
 
   # ----- Public
   parse: (commandLine) ->
-    @handle arg for arg in commandLine
+    @handle arg for arg in @cleanCommandLine(commandLine)
     @setDefaultValue(opt) for opt in @opts.optsWithDefaults()
     @givenOpts
 
@@ -234,6 +234,11 @@ class Parser
       parseInt(value)
     else
       parseFloat(value)
+      
+  cleanCommandLine: (cmdLine) ->
+    cmdLine = cmdLine[1..-1] unless cmdLine[0].match(/^-/)
+    _.flatten(x.split('=') for x in cmdLine)
+
 
 
 class Troll
@@ -245,16 +250,13 @@ class Troll
   # ----- Public
   setCommandLine: (@commandLine...) ->
 
-  getCommandLine: ->
-    @commandLine = _.flatten(x.split('=') for x in @commandLine[1..-1])
-
   getGivenOpts: ->
     @parser.givenOpts
 
   options: (callback) ->
     try
       @parseOptions callback
-      givenOpts = @parser.parse(@getCommandLine())
+      givenOpts = @parser.parse(@commandLine)
       @opts.validateRequired(givenOpts)
       return givenOpts
     catch error
@@ -299,7 +301,6 @@ class Troll
     pad = (" " for x in [strlen..len]).join("")
     "#{pad}--#{str}"
 
-
   puts: (args...) ->
     console.log args...
 
@@ -308,3 +309,4 @@ class Troll
 
 exports.Troll   = Troll
 exports.Options = Options
+exports.Parser  = Parser
