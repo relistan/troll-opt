@@ -15,6 +15,7 @@
   "engines": {
     "node": ">=0.6"
   },
+  "main": "./lib/troll",
   "dependencies": { "underscore": ">=1.3.0" },
   "devDependencies": { 
     "jasmine-node": ">=1.0.26", 
