@@ -196,7 +196,7 @@ class Parser
       @parsingStack = []
 
     else
-      throw new TrollArgumentError("Unknown argument: #{arg}")
+      throw new TrollArgumentError("Unknown argument or a value supplied for flag: #{arg}")
 
   recognized: (arg) ->
     bareArg = @stripDashes(arg)
@@ -217,14 +217,15 @@ class Parser
     typeof n is 'number' and (n % 1 == 0)
 
   convert: (opt, value) ->
-    type = @opts.get(opt).type
+    type = @opts.get(opt).type.toLowerCase()
     retValue = switch type.toLowerCase()
       when 'integer' then parseInt(value)
       when 'float'   then parseFloat(value)
       when 'number'  then @convertNumber(number)
       when 'string'  then value
 
-    if _.contains([ 'integer', 'float', 'number' ], type.toLowerCase()) and !(retValue > 0) and !(retValue < 0)
+    # Detect NaN
+    if _.contains([ 'integer', 'float', 'number' ], type) and !(retValue > 0) and !(retValue < 0)
       throw new TrollArgumentError("#{opt} has an invalid value supplied!  Must be a #{type}")
 
     retValue

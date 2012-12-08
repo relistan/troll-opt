@@ -5,46 +5,46 @@ _ = require('underscore')
 describe 'Parser', ->
 
   describe 'parsing the command line', ->
+    options = new Options()
+    options.parsedOpts = {
+      one:
+         default: true,
+         desc: 'Option one',
+         type: 'boolean',
+         takesValue: false,
+         short: 'o',
+      two:
+         default: false,
+         desc: 'Option two',
+         type: 'boolean',
+         takesValue: false,
+         short: 't',
+      three:
+         type: 'integer',
+         desc: 'Option three',
+         takesValue: true,
+         short: 'T',
+      four:
+         default: 'default for four',
+         desc: 'Option four',
+         type: 'string',
+         takesValue: true,
+         short: 'f',
+      five:
+         default: 'default for five',
+         desc: 'Option five',
+         type: 'string',
+         takesValue: true,
+         short: 'F' }
+
+    options.shortOpts = { 
+      o: 'one',
+      t: 'two',
+      T: 'three',
+      f: 'four',
+      F: 'five' }
+
     beforeEach ->
-      options = new Options()
-      options.parsedOpts = {
-        one:
-           default: true,
-           desc: 'Option one',
-           type: 'boolean',
-           takesValue: false,
-           short: 'o',
-        two:
-           default: false,
-           desc: 'Option two',
-           type: 'boolean',
-           takesValue: false,
-           short: 't',
-        three:
-           type: 'integer',
-           desc: 'Option three',
-           takesValue: true,
-           short: 'T',
-        four:
-           default: 'default for four',
-           desc: 'Option four',
-           type: 'string',
-           takesValue: true,
-           short: 'f',
-        five:
-           default: 'default for five',
-           desc: 'Option five',
-           type: 'string',
-           takesValue: true,
-           short: 'F' }
-
-      options.shortOpts = { 
-        o: 'one',
-        t: 'two',
-        T: 'three',
-        f: 'four',
-        F: 'five' }
-
       @parser = new Parser(options)
       @opts = @parser.parse([
         '--one', '--three', '1', '--two', '-f=1'
@@ -71,4 +71,7 @@ describe 'Parser', ->
       expect(@opts.three).toEqual 1
 
     it 'raises when the argument supplied is of the wrong type', ->
-
+      expect(=>
+        parser = new Parser(options) 
+        parser.parse(['test.coffee', '-t=badarg'])
+      ).toThrow("Unknown argument or a value supplied for flag: badarg")
