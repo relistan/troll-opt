@@ -174,7 +174,7 @@ class Parser
       throw new UsageError()
 
     if @recognized(arg) and !@haveArgWaiting()
-      arg = @stripDashes(arg)
+      arg = @toCamelCase(@stripDashes(arg))
 
       if @opts.hasShort(arg)
         arg = @opts.longForShort(arg)
@@ -199,12 +199,15 @@ class Parser
       throw new TrollArgumentError("Unknown argument or a value supplied for flag: #{arg}")
 
   recognized: (arg) ->
-    bareArg = @stripDashes(arg)
+    bareArg = @toCamelCase(@stripDashes(arg))
     (arg.match(/^--/) and @opts.has(bareArg)) or
        (arg.match(/^-/)  and @opts.hasShort(bareArg))
 
   stripDashes: (arg) ->
     arg.replace(/^-+/, '')
+
+  toCamelCase: (arg) ->
+    arg.replace(/(\-[a-z])/g, ($1)-> $1.toUpperCase().replace('-',''))
 
   haveArgWaiting: ->
     @parsingStack.length != 0

@@ -10,6 +10,9 @@ Troll-opt allows you to define and parse command line args in one
 simple definition. One line per opt: that's all you need. No chaining
 long series of commands together, no multiline parsing definitions.
 
+Using it
+--------
+
 A simple single option defintion looks like this:
 
 ```javascript
@@ -68,6 +71,22 @@ If we then inspect the contents of `opts` as defined above we see:
 { name: 'something', add: true, awesome: true }
 ```
 
+Multi-Word Arguments
+--------------------
+
+Troll-opt will do nice camelCase conversion of options for you for mulit-word
+command line arguments.
+
+```bash
+$ ./test.js --lib-path /usr/lib
+```
+
+Generates the options object:
+
+```javascript
+{ libPath: '/usr/lib' }
+```
+
 Features
 --------
 
@@ -80,9 +99,9 @@ are some of the things you get for free:
  * Automatic type conversion for basic types
  * Multiple command line syntaxes (getopt short, getopt long with and without =)
  * Nice looking usage output
+ * Conversion of multi-word command line arguments to camelCase
 
 Future Additions
 ---------------
 
- * Conversion of dashes in argument names to underscores
  * Trollop 2.0-like --no-option and --option handling for flags

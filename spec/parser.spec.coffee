@@ -72,6 +72,17 @@ describe 'Parser', ->
 
     it 'raises when the argument supplied is of the wrong type', ->
       expect(=>
-        parser = new Parser(options) 
+        parser = new Parser(options)
         parser.parse(['test.coffee', '-t=badarg'])
       ).toThrow("Unknown argument or a value supplied for flag: badarg")
+
+  describe 'working with multi-word options', ->
+
+    it 'converts mid-option dashes to camel case', ->
+      opts = new Options()
+      opts.opt 'twoCases', 'do something', default: true
+
+      parser = new Parser(opts)
+      parser.handle '--two-cases'
+
+      expect(_.has(parser.givenOpts, 'twoCases')).toBe true

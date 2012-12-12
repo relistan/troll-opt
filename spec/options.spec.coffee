@@ -108,10 +108,6 @@ describe 'Options', ->
     it 'raises when an invalid type is specified', ->
       expect( => @opts.opt 'header', 'Add one', type: 'asdf' ).toThrow('Invalid type: asdf')
 
-  describe 'working with multi-word options', ->
-
-    it 'converts mid-option dashes to underscores', ->
-
   describe 'usage banners', ->
   
     it 'can store a text argument', ->
