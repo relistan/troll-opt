@@ -2,9 +2,9 @@
 Troll-opt
 =========
 
-A powerful-but-simple command line parser in CoffeeScript for Node.js
-apps inspired by William Morgan's awesome
-[Trollop](http://trollop.rubyforge.org/) gem for Ruby.
+A powerful-but-simple command line parser for Node.js apps, 
+inspired by William Morgan's awesome [Trollop](http://trollop.rubyforge.org/) 
+gem for Ruby.
 
 Troll-opt allows you to define and parse command line args in one
 simple definition. One line per opt: that's all you need. No chaining
@@ -28,10 +28,10 @@ three different arguments and defines a help banner:
 Troll = require('troll-opt').Troll
 
 opts = (new Troll()).options(function(troll) {
-  troll.banner('Totally rad app that does something cool');
-  troll.opt('awesome', 'Turn on the awesome', { default: true });
+  troll.banner('Web listener that always responds with a defined message');
+  troll.opt('errors',  'Issue random errors to some responses', { default: true });
   troll.opt('name',    'The name of the application', { type: 'string', required: true });
-  troll.opt('add',     'Add some more awesome', { short: 'd', default: true });
+  troll.opt('code',    'The normal response code to generate', { short: 'o', default: 200 });
 });
 ```
 
@@ -40,41 +40,41 @@ application is invoked with the help flag: `app.js --help`.
 
 ```
 Usage: app.js [options]
-  A great program that everyone should run every day
-       --add, -d: Add some more awesome
-   --awesome, -a: Turn on the awesome (default: true)
+  Web listener that always responds with a defined message
+  --code, -o <n>: The normal response code to generate (default: 200)
+    --errors, -e: Issue random errors to some responses (default: false)
   --name, -n <s>: The name of the application (required)
-          --help: Display this text
+          --help: Display this help text
 ```
 
 If we pass that a command line like:
 
 ```bash
-$ ./test.js --name="something" --add
+$ ./test.js --name="something" --errors --code 201
 ```
 
 or:
 
 ```bash
-$ ./test.js --name something --add
+$ ./test.js --name something --errors --code 201
 ```
 
 or:
 
 ```bash
-$ ./test.js -n something -d
+$ ./test.js -n something -e -o 201
 ```
 
-If we then inspect the contents of `opts` as defined above we see:
+we then get the following contents of `opts` as defined above:
 
 ```javascript
-{ name: 'something', add: true, awesome: true }
+{ name: 'something', errors: true, code: 201 }
 ```
 
 Multi-Word Arguments
 --------------------
 
-Troll-opt will do nice camelCase conversion of options for you for mulit-word
+Troll-opt will do camelCase conversion of options for you for mulit-word
 command line arguments.
 
 ```bash
@@ -85,6 +85,14 @@ Generates the options object:
 
 ```javascript
 { libPath: '/usr/lib' }
+```
+
+You assign these in the definition in camelCase and the command line parser does
+the translation from ```lib-path``` to ```libPath``` before doing the lookup:
+
+```javascript
+opts = (new Troll()).options(function(troll) {
+  troll.opt('libPath', 'Path to the libraries', { default: '/usr/lib/' });
 ```
 
 Features
