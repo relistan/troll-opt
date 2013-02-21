@@ -95,6 +95,35 @@ opts = (new Troll()).options(function(troll) {
   troll.opt('libPath', 'Path to the libraries', { default: '/usr/lib/' });
 ```
 
+Remaining Arguments
+-------------------
+
+Any arguments that are supplied at the end of the command line, but which are not
+options to the previous argument are available via the following mechanism.
+
+Given that the following command is issued:
+
+```bash
+$ ./test.js --lib-path /usr/lib some-extra-argument another-one
+```
+
+You will need to keep the handle on the original `Troll` instance. This can then
+be used to access the remaining arguments on the command line like so:
+
+```javascript
+troll = new Troll()
+troll.options(function(troll) {
+  troll.opt('libPath', 'Path to the libraries', { default: '/usr/lib/' });
+
+troll.argv
+```
+
+`troll.argv` will then contain:
+
+```javascript
+[ 'some-extra-argument', 'another-one' ]
+```
+
 Features
 --------
 
