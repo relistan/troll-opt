@@ -114,8 +114,6 @@ be used to access the remaining arguments on the command line like so:
 troll = new Troll()
 troll.options(function(troll) {
   troll.opt('libPath', 'Path to the libraries', { default: '/usr/lib/' });
-
-troll.argv
 ```
 
 `troll.argv` will then contain:
