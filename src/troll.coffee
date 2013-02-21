@@ -160,7 +160,8 @@ class Parser
   constructor: (opts) ->
     @parsingStack = []
     @givenOpts    = {}
-    @opts = opts
+    @opts         = opts
+    @argv         = []
 
   # ----- Public
   parse: (commandLine) ->
@@ -174,6 +175,9 @@ class Parser
       throw new UsageError()
 
     if @recognized(arg) and !@haveArgWaiting()
+      if @argv.length > 0
+        throw new TrollArgumentError("Unknown argument: #{@argv.join(',')}")
+
       arg = @toCamelCase(@stripDashes(arg))
 
       if @opts.hasShort(arg)
@@ -195,8 +199,11 @@ class Parser
       @givenOpts[@parsingStack[0]] = arg
       @parsingStack = []
 
+    else if arg.match('/^-/')
+      throw new TrollArgumentError("Unknown argument: #{arg}")
+
     else
-      throw new TrollArgumentError("Unknown argument or a value supplied for flag: #{arg}")
+      @argv.push(arg)
 
   recognized: (arg) ->
     bareArg = @toCamelCase(@stripDashes(arg))
@@ -286,6 +293,8 @@ class Troll
     @displayOneOpt(opt, len) for opt in @opts.sorted()
     @puts (" " for x in [1..len+2]).join("") + "--help: Display this help text"
     @puts ""
+
+  argv: -> @parser.argv
 
   # ----- Private
   displayOneOpt: (opt, len) ->

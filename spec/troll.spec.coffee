@@ -24,6 +24,13 @@ describe 'Troll', ->
       expect(@troll.getOpts().getShortOpts()['h']).toEqual 'collision'
       expect(@troll.getOpts().getParsedOpts()['header']['short']).toEqual 'H'
 
+    it 'makes the remaining arguments in the argv available', ->
+      @troll.setCommandLine('test.coffee', '--header', 'William', 'extra-arg')
+      @troll.options (t) ->
+        t.opt 'header', 'Add a new header', default: 'X-Shakespeare'
+
+      expect(@troll.argv()).toEqual [ 'extra-arg' ]
+
   describe 'generating help output', ->
     beforeEach ->
       @troll = new Troll()

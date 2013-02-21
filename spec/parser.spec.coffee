@@ -70,11 +70,12 @@ describe 'Parser', ->
     it 'does type conversion to the desired type', ->
       expect(@opts.three).toEqual 1
 
-    it 'raises when the argument supplied is of the wrong type', ->
+    it 'raises when the argument supplied to a flag', ->
+      # Note that we can't detect this if it's the last arg on the command line
       expect(=>
         parser = new Parser(options)
-        parser.parse(['test.coffee', '-t=badarg'])
-      ).toThrow("Unknown argument or a value supplied for flag: badarg")
+        parser.parse(['test.coffee', '-t=badarg', '-f'])
+      ).toThrow("Unknown argument: badarg")
 
   describe 'working with multi-word options', ->
 
@@ -86,3 +87,20 @@ describe 'Parser', ->
       parser.handle '--two-cases'
 
       expect(_.has(parser.givenOpts, 'twoCases')).toBe true
+
+  describe 'working with the remaining command line options', ->
+
+    beforeEach ->
+      opts = new Options()
+      opts.opt 'one', 'a boring flag', default: true
+      @parser = new Parser(opts)
+
+    it 'does not complain with additional non-dashed arguments', ->
+      @parser.parse([ '--one', 'filename', 'filename2' ])
+      expect(_.has(@parser.givenOpts, 'one')).toBe true
+      expect(_.has(@parser.givenOpts, 'filename')).toBe false
+
+    it 'makes the remaining arguments available in parser.argv', ->
+      @parser.parse([ '--one', 'filename', 'filename2' ])
+      expect(@parser.argv).toEqual [ 'filename', 'filename2' ]
+    
